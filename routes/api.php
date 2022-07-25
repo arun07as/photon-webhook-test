@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,7 +26,28 @@ Route::any('/', function () {
 
 Route::any('/authenticate', function () {
     logger()->debug('authenticate', request()->all());
-    return response()->json(["ResultCode" => 1, "UserId" => "5", "Nickname" => "Arun A S", "Message" => "Authentication Success"]);
+    $request = request();
+    if (empty($request->token)) {
+        return response()->json([
+            'ResultCode' => 3,
+            'Message' => "Missing token",
+        ]);
+    }
+    $request->headers->add(['Authorization' => 'Bearer ' . $request->token]);
+    if (Auth::guard('sanctum')->check()) {
+        Auth::shouldUse('sanctum');
+        return response()->json([
+            'ResultCode' => 1,
+            'UserId' => Auth::user()->id,
+            'NickName' => Auth::user()->name,
+            'Message' => "Auth Success",
+            'Data' => ['email' => Auth::user()->email]
+        ]);
+    }
+    return response()->json([
+        'ResultCode' => 2,
+        'Message' => "Invalid token",
+    ]);
 });
 
 Route::any('create', function () {
