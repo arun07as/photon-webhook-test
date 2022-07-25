@@ -25,7 +25,7 @@ Route::any('/', function () {
 
 Route::any('/authenticate', function () {
     logger()->debug('authenticate', request()->all());
-    return response()->json(["ResultCode" => 1, "UserId" => "5"]);
+    return response()->json(["ResultCode" => 1, "UserId" => "5", "Nickname" => "Arun A S", "Message" => "Authentication Success"]);
 });
 
 Route::any('create', function () {
